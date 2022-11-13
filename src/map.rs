@@ -174,6 +174,11 @@ impl Map {
 		}
 	}
 
+	pub fn is_void_or_wall (&self, x: i32, y: i32) -> bool {
+		let idx = self.xy_idx(x, y);
+		self.tiles[idx] == TileType::Wall || self.tiles[idx] == TileType::Void
+	}
+
 }
 
 impl Algorithm2D for Map {

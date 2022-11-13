@@ -1,10 +1,15 @@
-mod simple_map;
 mod common;
+mod simple_map;
+mod bsp_dungeon;
 
 use specs::World;
-use simple_map::SimpleMapBuilder;
 use crate::Position;
 use super::Map;
+#[allow(unused_imports)]
+use crate::map_builder::{
+	simple_map::SimpleMapBuilder,
+	bsp_dungeon::BspDungeonBuilder,
+};
 
 pub trait MapBuilder {
 	fn get_map (&mut self) -> Map;
@@ -20,5 +25,10 @@ pub trait MapBuilder {
 }
 
 pub fn random_builder (depth: i32) -> Box<dyn MapBuilder> {
-	Box::new(SimpleMapBuilder::new(depth))
+	let mut rng = rltk::RandomNumberGenerator::new();
+	let builder = rng.roll_dice(1, 2);
+	match builder {
+		1 => Box::new(SimpleMapBuilder::new(depth)),
+		_ => Box::new(BspDungeonBuilder::new(depth)),
+	}
 }

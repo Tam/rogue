@@ -209,9 +209,6 @@ impl State {
         let mut builder = map_builder::random_builder(depth);
         builder.build();
 
-        #[cfg(feature = "mapgen_visualiser")]
-        { self.mapgen_history = builder.get_snapshot_history(); }
-
         let player_start;
         {
             let mut worldmap = self.ecs.write_resource::<Map>();
@@ -221,6 +218,9 @@ impl State {
 
         // Spawn entities
         builder.spawn(&mut self.ecs);
+
+        #[cfg(feature = "mapgen_visualiser")]
+        { self.mapgen_history = builder.get_snapshot_history(); }
 
         // Place player
         let mut player_pos = self.ecs.write_resource::<Point>();
@@ -236,10 +236,9 @@ impl State {
 
         let mut viewsheds = self.ecs.write_storage::<Viewshed>();
         let vs = viewsheds.get_mut(*player_entity);
-        if let Some(vs) = vs {
-            vs.dirty = true;
-        }
+        if let Some(vs) = vs { vs.dirty = true; }
     }
+
 }
 
 impl GameState for State {
@@ -273,7 +272,32 @@ impl GameState for State {
                             self.mapgen_running = false;
                         }
                     }
+
+                    let msg = " Generating Map".to_owned() + match self.mapgen_index % 4 {
+                        0 => ".   ",
+                        1 => "..  ",
+                        2 => "... ",
+                        _ => "    ",
+                    };
+
+                    ctx.print_color_centered(
+                        MAP_HEIGHT + 2,
+                        RGB::named(rltk::CORAL),
+                        RGB::named(rltk::BLACK),
+                        msg,
+                    );
                 } else {
+                    // Draw entities
+                    {
+                        let positions = self.ecs.read_storage::<Position>();
+                        let renderables = self.ecs.read_storage::<Renderable>();
+                        let mut data = (&positions, &renderables).join().collect::<Vec<_>>();
+                        data.sort_by(|&a, &b| b.1.render_order.cmp(&a.1.render_order));
+                        for (pos, render) in data.iter() {
+                            ctx.set(pos.x, pos.y, render.fg, render.bg, render.glyph);
+                        }
+                    }
+
                     ctx.print_color_centered(
                         MAP_HEIGHT + 2,
                         RGB::named(rltk::SPRINGGREEN),
@@ -287,7 +311,7 @@ impl GameState for State {
                         " Press SPACE to regenerate ",
                     );
                     if ctx.key.unwrap_or(VirtualKeyCode::Key0) == VirtualKeyCode::Space {
-                        self.generate_world_map(1);
+                        self.game_over_cleanup();
                     }
                 }
             }

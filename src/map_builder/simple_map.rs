@@ -32,6 +32,7 @@ impl MapBuilder for SimpleMapBuilder {
 		for room in self.rooms.iter().skip(1) {
 			spawner::spawn_room(ecs, room, self.depth, &self.map);
 		}
+		#[cfg(feature = "mapgen_visualiser")] self.take_snapshot();
 	}
 
 	#[cfg(feature = "mapgen_visualiser")]
@@ -49,6 +50,7 @@ impl MapBuilder for SimpleMapBuilder {
 }
 
 impl SimpleMapBuilder {
+	#[allow(dead_code)]
 	pub fn new (depth: i32) -> SimpleMapBuilder {
 		SimpleMapBuilder {
 			map: Map::new(
@@ -118,5 +120,7 @@ impl SimpleMapBuilder {
 			x: start_pos.0,
 			y: start_pos.1,
 		};
+
+		#[cfg(feature = "mapgen_visualiser")] self.take_snapshot();
 	}
 }
