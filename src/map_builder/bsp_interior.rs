@@ -130,7 +130,7 @@ impl MapBuilder for BspInteriorBuilder {
 				}
 			}
 
-			self.take_snapshot();
+			#[cfg(feature = "mapgen_visualiser")] self.take_snapshot();
 		}
 
 		for i in 0..self.rooms.len() - 1 {
@@ -158,16 +158,10 @@ impl MapBuilder for BspInteriorBuilder {
 
 	fn spawn(&mut self, ecs: &mut World) {
 		for room in self.rooms.iter().skip(1) {
-			let inset_room = Rect {
-				x1: room.x1 + 1,
-				x2: room.x2 - 1,
-				y1: room.y1 + 1,
-				y2: room.y2 - 1,
-			};
-			spawner::spawn_room(ecs, &inset_room, self.depth, &self.map);
+			spawner::spawn_room(ecs, &room, self.depth, &self.map);
 		}
 
-		self.take_snapshot();
+		#[cfg(feature = "mapgen_visualiser")] self.take_snapshot();
 	}
 
 	#[cfg(feature = "mapgen_visualiser")]

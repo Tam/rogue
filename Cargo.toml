@@ -16,7 +16,7 @@ opt-level = 1
 opt-level = 3
 
 [dependencies]
-rltk = { version = "0.8.0", features = ["serde"] }
+rltk = { version = "0.8.0", features = ["serde", "threaded"] }
 specs = { version = "0.18.0", features = ["serde"] }
 specs-derive = "0.4.1"
 serde = { version = "1.0.147", features = ["derive"] }

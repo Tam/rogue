@@ -150,6 +150,7 @@ dependencies = [
  "bracket-algorithm-traits",
  "bracket-geometry",
  "num-rational",
+ "rayon",
  "smallvec",
 ]
 

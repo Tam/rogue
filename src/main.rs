@@ -1,3 +1,4 @@
+#![feature(macro_metavar_expr)]
 extern crate serde;
 
 pub mod components;
@@ -24,7 +25,8 @@ pub use components::*;
 pub use map::*;
 pub use player::*;
 
-use rltk::{Rltk, GameState, RGB, Point, RandomNumberGenerator, VirtualKeyCode};
+use rltk::{Rltk, GameState, RGB, Point, RandomNumberGenerator};
+#[cfg(feature = "mapgen_visualiser")] use rltk::VirtualKeyCode;
 use crate::map::Map;
 use specs::prelude::*;
 use specs::saveload::{SimpleMarker, SimpleMarkerAllocator};
@@ -195,6 +197,16 @@ impl State {
         }
 
         // Generate map
+        #[cfg(feature = "mapgen_visualiser")]
+        {
+            let depth;
+            {
+                let mut rng = self.ecs.write_resource::<RandomNumberGenerator>();
+                depth = rng.roll_dice(1, 4);
+            }
+            self.generate_world_map(depth);
+        }
+        #[cfg(not(feature = "mapgen_visualiser"))]
         self.generate_world_map(1);
     }
 
@@ -278,6 +290,7 @@ impl GameState for State {
                         }
                     }
 
+                    let map = self.ecs.fetch::<Map>();
                     let msg = format!(
                         " Generating {} Map{}",
                         self.mapgen_name,
@@ -294,6 +307,29 @@ impl GameState for State {
                         RGB::named(rltk::CORAL),
                         RGB::named(rltk::BLACK),
                         msg,
+                    );
+                    ctx.print_color_right(
+                        MAP_WIDTH / 2 - 16,
+                        MAP_HEIGHT + 4,
+                        RGB::named(rltk::GREY50),
+                        RGB::named(rltk::BLACK),
+                        format!("Depth {}", map.depth),
+                    );
+                    ctx.draw_bar_horizontal(
+                        MAP_WIDTH / 2 - 15,
+                        MAP_HEIGHT + 4,
+                        30,
+                        self.mapgen_index,
+                        self.mapgen_history.len(),
+                        RGB::named(rltk::GREY30),
+                        RGB::named(rltk::GRAY24),
+                    );
+                    ctx.print_color(
+                        MAP_WIDTH / 2 + 16,
+                        MAP_HEIGHT + 4,
+                        RGB::named(rltk::GREY50),
+                        RGB::named(rltk::BLACK),
+                        format!("{: >3} / {: <3}", self.mapgen_index, self.mapgen_history.len()),
                     );
                 } else {
                     // Draw entities

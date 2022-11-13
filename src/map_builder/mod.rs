@@ -2,6 +2,7 @@ mod common;
 mod simple_map;
 mod bsp_dungeon;
 mod bsp_interior;
+mod cellular_automata;
 
 use specs::World;
 use crate::Position;
@@ -11,6 +12,7 @@ use crate::map_builder::{
 	simple_map::SimpleMapBuilder,
 	bsp_dungeon::BspDungeonBuilder,
 	bsp_interior::BspInteriorBuilder,
+	cellular_automata::CellularAutomataBuilder,
 };
 
 pub trait MapBuilder {
@@ -28,12 +30,22 @@ pub trait MapBuilder {
 	fn take_snapshot (&mut self);
 }
 
+macro_rules! pick_random {
+	($($x:expr),* $(,)?) => {{
+		let mut rng = rltk::RandomNumberGenerator::new();
+		let builder = rng.roll_dice(1, ${count(x, 0)}) - 1;
+		match builder {
+			$(${index()} => $x,)*
+			_ => panic!("Map out of range!")
+		}
+	}};
+}
+
 pub fn random_builder (depth: i32) -> Box<dyn MapBuilder> {
-	let mut rng = rltk::RandomNumberGenerator::new();
-	let builder = rng.roll_dice(1, 3);
-	match builder {
-		1 => Box::new(SimpleMapBuilder::new(depth)),
-		2 => Box::new(BspInteriorBuilder::new(depth)),
-		_ => Box::new(BspDungeonBuilder::new(depth)),
-	}
+	pick_random!(
+		Box::new(SimpleMapBuilder::new(depth)),
+		Box::new(BspInteriorBuilder::new(depth)),
+		Box::new(CellularAutomataBuilder::new(depth)),
+		Box::new(BspDungeonBuilder::new(depth)),
+	)
 }
