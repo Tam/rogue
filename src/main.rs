@@ -68,6 +68,7 @@ pub enum RunState {
 pub struct State {
     pub ecs: World,
 
+    #[cfg(feature = "mapgen_visualiser")] mapgen_name    : String,
     #[cfg(feature = "mapgen_visualiser")] mapgen_running : bool,
     #[cfg(feature = "mapgen_visualiser")] mapgen_history : Vec<Map>,
     #[cfg(feature = "mapgen_visualiser")] mapgen_index   : usize,
@@ -200,6 +201,7 @@ impl State {
     fn generate_world_map (&mut self, depth: i32) {
         #[cfg(feature = "mapgen_visualiser")]
         {
+            self.mapgen_name = "".to_string();
             self.mapgen_running = true;
             self.mapgen_index = 0;
             self.mapgen_timer = 0.;
@@ -220,7 +222,10 @@ impl State {
         builder.spawn(&mut self.ecs);
 
         #[cfg(feature = "mapgen_visualiser")]
-        { self.mapgen_history = builder.get_snapshot_history(); }
+        {
+            self.mapgen_name = builder.get_name();
+            self.mapgen_history = builder.get_snapshot_history();
+        }
 
         // Place player
         let mut player_pos = self.ecs.write_resource::<Point>();
@@ -273,12 +278,16 @@ impl GameState for State {
                         }
                     }
 
-                    let msg = " Generating Map".to_owned() + match self.mapgen_index % 4 {
-                        0 => ".   ",
-                        1 => "..  ",
-                        2 => "... ",
-                        _ => "    ",
-                    };
+                    let msg = format!(
+                        " Generating {} Map{}",
+                        self.mapgen_name,
+                        match self.mapgen_index % 4 {
+                            0 => ".   ",
+                            1 => "..  ",
+                            2 => "... ",
+                            _ => "    ",
+                        },
+                    );
 
                     ctx.print_color_centered(
                         MAP_HEIGHT + 2,
@@ -532,6 +541,7 @@ fn main() -> rltk::BError {
     let mut gs = State {
         ecs: World::new(),
 
+        #[cfg(feature = "mapgen_visualiser")] mapgen_name: String::new(),
         #[cfg(feature = "mapgen_visualiser")] mapgen_running: true,
         #[cfg(feature = "mapgen_visualiser")] mapgen_index: 0,
         #[cfg(feature = "mapgen_visualiser")] mapgen_history: Vec::new(),

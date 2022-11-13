@@ -106,7 +106,15 @@ impl BspDungeonBuilder {
 			let idx = self.map.xy_idx(x, y);
 			self.map.tiles[idx] = TileType::Floor;
 
-			// TODO: add walls to corridors!
+			for y2 in y - 1 ..= y + 1 {
+				for x2 in x - 1 ..= x + 1 {
+					if x == x2 && y == y2 { continue }
+					let idx = self.map.xy_idx(x2, y2);
+					if self.map.tiles[idx] != TileType::Floor {
+						self.map.tiles[idx] = TileType::Wall
+					}
+				}
+			}
 		}
 	}
 }
@@ -187,6 +195,9 @@ impl MapBuilder for BspDungeonBuilder {
 
 		#[cfg(feature = "mapgen_visualiser")] self.take_snapshot();
 	}
+
+	#[cfg(feature = "mapgen_visualiser")]
+	fn get_name(&self) -> String { "BSP".to_string() }
 
 	#[cfg(feature = "mapgen_visualiser")]
 	fn get_snapshot_history(&self) -> Vec<Map> {

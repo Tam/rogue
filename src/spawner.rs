@@ -2,7 +2,7 @@ use std::collections::HashMap;
 use rltk::{RandomNumberGenerator, RGB};
 use specs::prelude::*;
 use specs::saveload::{MarkedBuilder, SimpleMarker};
-use crate::{AreaOfEffect, BlocksTile, CombatStats, Confusion, Consumable, DefenseBonus, EntityTrigger, EquipmentSlot, Equippable, Hidden, HungerClock, HungerState, InflictsDamage, Item, MagicMapper, MAP_WIDTH, MeleePowerBonus, Monster, Name, Player, Position, ProvidesFood, ProvidesHealing, Ranged, Renderable, SerializeMe, SingleActivation, TileType, Viewshed};
+use crate::{AreaOfEffect, BlocksTile, CombatStats, Confusion, Consumable, DefenseBonus, EntityTrigger, EquipmentSlot, Equippable, Hidden, HungerClock, HungerState, InflictsDamage, Item, MagicMapper, MeleePowerBonus, Monster, Name, Player, Position, ProvidesFood, ProvidesHealing, Ranged, Renderable, SerializeMe, SingleActivation, TileType, Viewshed};
 use crate::map::Map;
 use crate::random_table::RandomTable;
 use crate::rect::Rect;
@@ -322,7 +322,7 @@ pub fn spawn_room (ecs: &mut World, room: &Rect, map_depth: i32, map: &Map) {
 				let x = (room.x1 + rng.roll_dice(1, i32::abs(room.x2 - room.x1))) as usize;
 				let y = (room.y1 + rng.roll_dice(1, i32::abs(room.y2 - room.y1))) as usize;
 
-				let idx = (y * MAP_WIDTH) + x;
+				let idx = (y * map.width as usize) + x;
 
 				if map.tiles[idx] == TileType::DownStairs { continue }
 
@@ -338,8 +338,8 @@ pub fn spawn_room (ecs: &mut World, room: &Rect, map_depth: i32, map: &Map) {
 	}
 
 	for (idx, name) in spawn_points.iter() {
-		let x = (*idx % MAP_WIDTH) as i32;
-		let y = (*idx / MAP_WIDTH) as i32;
+		let x = (*idx % map.width as usize) as i32;
+		let y = (*idx / map.width as usize) as i32;
 
 		match name.as_ref() {
 			"Goblin" => goblin(ecs, x, y),

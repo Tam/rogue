@@ -36,6 +36,9 @@ impl MapBuilder for SimpleMapBuilder {
 	}
 
 	#[cfg(feature = "mapgen_visualiser")]
+	fn get_name(&self) -> String { "Scattershot".to_string() }
+
+	#[cfg(feature = "mapgen_visualiser")]
 	fn get_snapshot_history(&self) -> Vec<Map> {
 		self.history.clone()
 	}
