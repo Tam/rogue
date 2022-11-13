@@ -1,0 +1,23 @@
+[package]
+name = "rogue"
+version = "0.1.0"
+edition = "2021"
+
+[features]
+# Comment out to disable map gen visualiser
+mapgen_visualiser = []
+
+# Enable a small amount of optimization in debug mode
+[profile.dev]
+opt-level = 1
+
+# Enable high optimizations for dependencies (incl. Bevy), but not for our code:
+[profile.dev.package."*"]
+opt-level = 3
+
+[dependencies]
+rltk = { version = "0.8.0", features = ["serde"] }
+specs = { version = "0.18.0", features = ["serde"] }
+specs-derive = "0.4.1"
+serde = { version = "1.0.147", features = ["derive"] }
+serde_json = "1.0.87"
