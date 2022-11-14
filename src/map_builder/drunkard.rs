@@ -36,7 +36,7 @@ impl DrunkardWalkBuilder {
 				MAP_WIDTH as i32,
 				MAP_HEIGHT as i32,
 				depth,
-				Some(TileType::Wall)
+				Some(TileType::Wall),
 			),
 			starting_position: Position { x: 0, y: 0 },
 			depth,

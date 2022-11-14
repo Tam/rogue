@@ -349,11 +349,25 @@ impl GameState for State {
                         RGB::named(rltk::BLACK),
                         " Map Generated ",
                     );
+                    ctx.print_color_right(
+                        MAP_WIDTH / 2 - 16,
+                        MAP_HEIGHT + 4,
+                        RGB::named(rltk::GREY50),
+                        RGB::named(rltk::BLACK),
+                        format!("Depth {}", &self.mapgen_history[0].depth),
+                    );
                     ctx.print_color_centered(
                         MAP_HEIGHT + 4,
                         RGB::named(rltk::GREY),
                         RGB::named(rltk::BLACK),
-                        " Press SPACE to regenerate ",
+                        "Press SPACE to regenerate",
+                    );
+                    ctx.print_color(
+                        MAP_WIDTH / 2 + 16,
+                        MAP_HEIGHT + 4,
+                        RGB::named(rltk::GREY50),
+                        RGB::named(rltk::BLACK),
+                        format!("{0: >3} / {0: <3}", self.mapgen_history.len()),
                     );
                     if ctx.key.unwrap_or(VirtualKeyCode::Key0) == VirtualKeyCode::Space {
                         self.game_over_cleanup();

@@ -16,6 +16,7 @@ use crate::map_builder::{
 	bsp_interior::BspInteriorBuilder,
 	cellular_automata::CellularAutomataBuilder,
 	drunkard::*,
+	maze::MazeBuilder,
 };
 
 pub trait MapBuilder {
@@ -53,5 +54,6 @@ pub fn random_builder (depth: i32) -> Box<dyn MapBuilder> {
 		Box::new(DrunkardWalkBuilder::open_area(depth)),
 		Box::new(DrunkardWalkBuilder::open_halls(depth)),
 		Box::new(DrunkardWalkBuilder::winding_passages(depth)),
+		Box::new(MazeBuilder::new(depth)),
 	)
 }
