@@ -3,7 +3,7 @@ use specs::World;
 use crate::map::Map;
 use crate::map_builder::MapBuilder;
 use crate::{MAP_HEIGHT, MAP_WIDTH, Position, spawner, TileType};
-use crate::map_builder::common::apply_room_to_map;
+use crate::map_builder::common::{apply_room_to_map, draw_corridor, snapshot};
 use crate::rect::Rect;
 
 pub struct BspDungeonBuilder {
@@ -92,31 +92,6 @@ impl BspDungeonBuilder {
 
 		return can_build;
 	}
-
-	fn draw_corridor (&mut self, x1: i32, y1: i32, x2: i32, y2: i32) {
-		let mut x = x1;
-		let mut y = y1;
-
-		while x != x2 || y != y2 {
-			if x < x2 { x += 1 }
-			else if x > x2 { x -= 1 }
-			else if y < y2 { y += 1 }
-			else if y > y2 { y -= 1 }
-
-			let idx = self.map.xy_idx(x, y);
-			self.map.tiles[idx] = TileType::Floor;
-
-			for y2 in y - 1 ..= y + 1 {
-				for x2 in x - 1 ..= x + 1 {
-					if x == x2 && y == y2 { continue }
-					let idx = self.map.xy_idx(x2, y2);
-					if self.map.tiles[idx] != TileType::Floor {
-						self.map.tiles[idx] = TileType::Wall
-					}
-				}
-			}
-		}
-	}
 }
 
 impl MapBuilder for BspDungeonBuilder {
@@ -171,7 +146,7 @@ impl MapBuilder for BspDungeonBuilder {
 			let end_x = next_room.x1 + (rng.roll_dice(1, i32::abs(next_room.x1 - next_room.x2))-1);
 			let end_y = next_room.y1 + (rng.roll_dice(1, i32::abs(next_room.y1 - next_room.y2))-1);
 
-			self.draw_corridor(start_x, start_y, end_x, end_y);
+			draw_corridor(&mut self.map, start_x, start_y, end_x, end_y);
 			#[cfg(feature = "mapgen_visualiser")] self.take_snapshot();
 		}
 
@@ -206,9 +181,6 @@ impl MapBuilder for BspDungeonBuilder {
 
 	#[cfg(feature = "mapgen_visualiser")]
 	fn take_snapshot(&mut self) {
-		let mut snapshot = self.map.clone();
-		for v in snapshot.revealed_tiles.iter_mut() { *v = true; }
-		for v in snapshot.visible_tiles.iter_mut() { *v = true; }
-		self.history.push(snapshot);
+		self.history.push(snapshot(&self.map));
 	}
 }

@@ -3,6 +3,8 @@ mod simple_map;
 mod bsp_dungeon;
 mod bsp_interior;
 mod cellular_automata;
+mod drunkard;
+mod maze;
 
 use specs::World;
 use crate::Position;
@@ -13,6 +15,7 @@ use crate::map_builder::{
 	bsp_dungeon::BspDungeonBuilder,
 	bsp_interior::BspInteriorBuilder,
 	cellular_automata::CellularAutomataBuilder,
+	drunkard::*,
 };
 
 pub trait MapBuilder {
@@ -33,7 +36,7 @@ pub trait MapBuilder {
 macro_rules! pick_random {
 	($($x:expr),* $(,)?) => {{
 		let mut rng = rltk::RandomNumberGenerator::new();
-		let builder = rng.roll_dice(1, ${count(x, 0)}) - 1;
+		let builder = (rng.roll_dice(1, ${count(x, 0)}) - 1) as u8;
 		match builder {
 			$(${index()} => $x,)*
 			_ => panic!("Map out of range!")
@@ -47,5 +50,8 @@ pub fn random_builder (depth: i32) -> Box<dyn MapBuilder> {
 		Box::new(BspInteriorBuilder::new(depth)),
 		Box::new(CellularAutomataBuilder::new(depth)),
 		Box::new(BspDungeonBuilder::new(depth)),
+		Box::new(DrunkardWalkBuilder::open_area(depth)),
+		Box::new(DrunkardWalkBuilder::open_halls(depth)),
+		Box::new(DrunkardWalkBuilder::winding_passages(depth)),
 	)
 }

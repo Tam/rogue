@@ -8,6 +8,7 @@ use specs::{Entity};
 #[derive(PartialEq, Copy, Clone, Serialize, Deserialize)]
 pub enum TileType {
 	Void,
+	Placeholder,
 	Wall,
 	Floor,
 	DownStairs,
@@ -34,6 +35,10 @@ pub fn draw_map (map: &Map, ctx: &mut Rltk) {
 				TileType::DownStairs => {
 					glyph = rltk::to_cp437('▼');
 					fg = RGB::named(rltk::WHEAT4);
+				}
+				TileType::Placeholder => {
+					glyph = rltk::to_cp437('#');
+					fg = RGB::named(rltk::SLATEGRAY);
 				}
 				TileType::Void => {
 					glyph = 0;

@@ -2,6 +2,7 @@ use rltk::RandomNumberGenerator;
 use specs::World;
 use crate::map::Map;
 use crate::{MAP_HEIGHT, MAP_WIDTH, Position, spawner, TileType};
+use crate::map_builder::common::snapshot;
 use crate::map_builder::MapBuilder;
 use crate::rect::Rect;
 
@@ -176,9 +177,6 @@ impl MapBuilder for BspInteriorBuilder {
 
 	#[cfg(feature = "mapgen_visualiser")]
 	fn take_snapshot(&mut self) {
-		let mut snapshot = self.map.clone();
-		for v in snapshot.revealed_tiles.iter_mut() { *v = true; }
-		for v in snapshot.visible_tiles.iter_mut() { *v = true; }
-		self.history.push(snapshot);
+		self.history.push(snapshot(&self.map));
 	}
 }

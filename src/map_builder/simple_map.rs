@@ -3,7 +3,7 @@ use specs::World;
 use crate::map::Map;
 use crate::map_builder::MapBuilder;
 use crate::{MAP_HEIGHT, MAP_WIDTH, Position, spawner, TileType};
-use crate::map_builder::common::{apply_horizontal_tunnel, apply_room_to_map, apply_vertical_tunnel};
+use crate::map_builder::common::{apply_horizontal_tunnel, apply_room_to_map, apply_vertical_tunnel, snapshot};
 use crate::rect::Rect;
 
 pub struct SimpleMapBuilder {
@@ -45,10 +45,7 @@ impl MapBuilder for SimpleMapBuilder {
 
 	#[cfg(feature = "mapgen_visualiser")]
 	fn take_snapshot(&mut self) {
-		let mut snapshot = self.map.clone();
-		for v in snapshot.revealed_tiles.iter_mut() { *v = true; }
-		for v in snapshot.visible_tiles.iter_mut() { *v = true; }
-		self.history.push(snapshot);
+		self.history.push(snapshot(&self.map));
 	}
 }
 
