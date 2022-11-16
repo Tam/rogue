@@ -5,6 +5,7 @@ mod bsp_interior;
 mod cellular_automata;
 mod drunkard;
 mod maze;
+mod dla;
 
 use specs::World;
 use crate::Position;
@@ -17,6 +18,7 @@ use crate::map_builder::{
 	cellular_automata::CellularAutomataBuilder,
 	drunkard::*,
 	maze::MazeBuilder,
+	dla::DLABuilder,
 };
 
 pub trait MapBuilder {
@@ -55,5 +57,9 @@ pub fn random_builder (depth: i32) -> Box<dyn MapBuilder> {
 		Box::new(DrunkardWalkBuilder::open_halls(depth)),
 		Box::new(DrunkardWalkBuilder::winding_passages(depth)),
 		Box::new(MazeBuilder::new(depth)),
+		Box::new(DLABuilder::walk_inwards(depth)),
+		Box::new(DLABuilder::walk_outwards(depth)),
+		Box::new(DLABuilder::central_attractor(depth)),
+		Box::new(DLABuilder::insectoid(depth)),
 	)
 }

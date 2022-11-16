@@ -69,7 +69,7 @@ impl DrunkardWalkBuilder {
 	#[allow(dead_code)]
 	pub fn winding_passages (depth: i32) -> DrunkardWalkBuilder {
 		DrunkardWalkBuilder::new(depth, DrunkardSettings {
-			spawn_mode: DrunkSpawnMode::StartingPoint,
+			spawn_mode: DrunkSpawnMode::Random,
 			lifetime: 100,
 			floor_percent: 0.4,
 			#[cfg(feature = "mapgen_visualiser")] name: "Winding Passages".to_string(),
