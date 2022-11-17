@@ -6,6 +6,7 @@ mod cellular_automata;
 mod drunkard;
 mod maze;
 mod dla;
+mod voronoi;
 
 use specs::World;
 use crate::Position;
@@ -20,6 +21,7 @@ use crate::map_builder::{
 	maze::MazeBuilder,
 	dla::DLABuilder,
 };
+use crate::map_builder::voronoi::VoronoiBuilder;
 
 pub trait MapBuilder {
 	fn get_map (&mut self) -> Map;
@@ -56,10 +58,15 @@ pub fn random_builder (depth: i32) -> Box<dyn MapBuilder> {
 		Box::new(DrunkardWalkBuilder::open_area(depth)),
 		Box::new(DrunkardWalkBuilder::open_halls(depth)),
 		Box::new(DrunkardWalkBuilder::winding_passages(depth)),
+		Box::new(DrunkardWalkBuilder::fat_passages(depth)),
+		Box::new(DrunkardWalkBuilder::fearful_symmetry(depth)),
 		Box::new(MazeBuilder::new(depth)),
 		Box::new(DLABuilder::walk_inwards(depth)),
 		Box::new(DLABuilder::walk_outwards(depth)),
 		Box::new(DLABuilder::central_attractor(depth)),
 		Box::new(DLABuilder::insectoid(depth)),
+		Box::new(VoronoiBuilder::pythagoras(depth)),
+		Box::new(VoronoiBuilder::manhattan(depth)),
+		Box::new(VoronoiBuilder::chebyshev(depth)),
 	)
 }

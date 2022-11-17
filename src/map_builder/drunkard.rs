@@ -3,7 +3,7 @@ use rltk::RandomNumberGenerator;
 use specs::World;
 use crate::map::Map;
 use crate::{MAP_HEIGHT, MAP_WIDTH, Position, spawner, TileType};
-use crate::map_builder::common::{generate_voronoi_spawn_regions, remove_unreachable_areas_returning_most_distant, snapshot};
+use crate::map_builder::common::{generate_voronoi_spawn_regions, paint, remove_unreachable_areas_returning_most_distant, snapshot, Symmetry};
 use crate::map_builder::MapBuilder;
 
 #[allow(dead_code)]
@@ -16,6 +16,8 @@ pub struct DrunkardSettings {
 	pub spawn_mode: DrunkSpawnMode,
 	pub lifetime: i32,
 	pub floor_percent: f32,
+	pub brush_size: i32,
+	pub symmetry: Symmetry,
 	#[cfg(feature = "mapgen_visualiser")] pub name: String,
 }
 
@@ -29,7 +31,6 @@ pub struct DrunkardWalkBuilder {
 }
 
 impl DrunkardWalkBuilder {
-	#[allow(dead_code)]
 	pub fn new (depth: i32, settings: DrunkardSettings) -> DrunkardWalkBuilder {
 		DrunkardWalkBuilder {
 			map: Map::new(
@@ -52,6 +53,8 @@ impl DrunkardWalkBuilder {
 			spawn_mode: DrunkSpawnMode::StartingPoint,
 			lifetime: 400,
 			floor_percent: 0.5,
+			brush_size: 1,
+			symmetry: Symmetry::None,
 			#[cfg(feature = "mapgen_visualiser")] name: "Open Area".to_string(),
 		})
 	}
@@ -62,6 +65,8 @@ impl DrunkardWalkBuilder {
 			spawn_mode: DrunkSpawnMode::Random,
 			lifetime: 400,
 			floor_percent: 0.5,
+			brush_size: 1,
+			symmetry: Symmetry::None,
 			#[cfg(feature = "mapgen_visualiser")] name: "Open Halls".to_string(),
 		})
 	}
@@ -72,7 +77,33 @@ impl DrunkardWalkBuilder {
 			spawn_mode: DrunkSpawnMode::Random,
 			lifetime: 100,
 			floor_percent: 0.4,
+			brush_size: 1,
+			symmetry: Symmetry::None,
 			#[cfg(feature = "mapgen_visualiser")] name: "Winding Passages".to_string(),
+		})
+	}
+
+	#[allow(dead_code)]
+	pub fn fat_passages (depth: i32) -> DrunkardWalkBuilder {
+		DrunkardWalkBuilder::new(depth, DrunkardSettings {
+			spawn_mode: DrunkSpawnMode::Random,
+			lifetime: 100,
+			floor_percent: 0.4,
+			brush_size: 2,
+			symmetry: Symmetry::None,
+			#[cfg(feature = "mapgen_visualiser")] name: "Fat Passages".to_string(),
+		})
+	}
+
+	#[allow(dead_code)]
+	pub fn fearful_symmetry (depth: i32) -> DrunkardWalkBuilder {
+		DrunkardWalkBuilder::new(depth, DrunkardSettings {
+			spawn_mode: DrunkSpawnMode::Random,
+			lifetime: 100,
+			floor_percent: 0.4,
+			brush_size: 1,
+			symmetry: Symmetry::Both,
+			#[cfg(feature = "mapgen_visualiser")] name: "Fearful Symmetry".to_string(),
 		})
 	}
 }
@@ -136,10 +167,24 @@ impl MapBuilder for DrunkardWalkBuilder {
 					#[cfg(feature = "mapgen_visualiser")]
 					{
 						did_something = true;
-						self.map.tiles[drunk_idx] = TileType::Placeholder;
+						paint(
+							&mut self.map,
+							self.settings.symmetry,
+							self.settings.brush_size,
+							drunk_x, drunk_y,
+							Some(TileType::Placeholder)
+						);
 					}
 					#[cfg(not(feature = "mapgen_visualiser"))]
-					{ self.map.tiles[drunk_idx] = TileType::Floor; }
+					{
+						self.map.tiles[drunk_idx] = TileType::Floor;
+						paint(
+							&mut self.map,
+							self.settings.symmetry,
+							self.settings.brush_size,
+							drunk_x, drunk_y, None
+						);
+					}
 				}
 
 				let stagger_direction = rng.roll_dice(1, 4);
