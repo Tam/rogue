@@ -3,7 +3,8 @@ use specs::World;
 use crate::map::Map;
 use crate::map_builder::MapBuilder;
 use crate::{MAP_HEIGHT, MAP_WIDTH, Position, spawner, TileType};
-use crate::map_builder::common::{apply_horizontal_tunnel, apply_room_to_map, apply_vertical_tunnel, snapshot};
+use crate::map_builder::common::{apply_horizontal_tunnel, apply_room_to_map, apply_vertical_tunnel};
+#[cfg(feature = "mapgen_visualiser")] use crate::map_builder::common::snapshot;
 use crate::rect::Rect;
 
 pub struct SimpleMapBuilder {

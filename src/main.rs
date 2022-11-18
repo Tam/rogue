@@ -20,6 +20,7 @@ pub mod particle_system;
 pub mod hunger_system;
 pub mod trigger_system;
 pub mod map_builder;
+pub mod rex_assets;
 
 pub use components::*;
 pub use map::*;
@@ -665,6 +666,7 @@ fn main() -> rltk::BError {
     // Resource to get next marker identity
     gs.ecs.insert(SimpleMarkerAllocator::<SerializeMe>::new());
 
+    gs.ecs.insert(rex_assets::RexAssets::new());
     gs.ecs.insert(RandomNumberGenerator::new());
     gs.ecs.insert(particle_system::ParticleBuilder::new());
     gs.ecs.insert(GameLog {

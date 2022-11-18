@@ -3,7 +3,8 @@ use rltk::RandomNumberGenerator;
 use specs::World;
 use crate::map::Map;
 use crate::{MAP_HEIGHT, MAP_WIDTH, Position, spawner, TileType};
-use crate::map_builder::common::{generate_voronoi_spawn_regions, remove_unreachable_areas_returning_most_distant, snapshot};
+use crate::map_builder::common::{generate_voronoi_spawn_regions, remove_unreachable_areas_returning_most_distant};
+#[cfg(feature = "mapgen_visualiser")] use crate::map_builder::common::snapshot;
 use crate::map_builder::MapBuilder;
 
 #[derive(PartialEq, Copy, Clone)]
@@ -25,7 +26,12 @@ pub struct VoronoiBuilder {
 }
 
 impl VoronoiBuilder {
-	pub fn new (depth: i32, distance_algorithm: DistanceAlgorithm, name: String) -> VoronoiBuilder {
+
+	pub fn new (
+		depth: i32,
+		distance_algorithm: DistanceAlgorithm,
+		#[allow(unused_variables)] name: String,
+	) -> VoronoiBuilder {
 		VoronoiBuilder {
 			map: Map::new(
 				MAP_WIDTH as i32,

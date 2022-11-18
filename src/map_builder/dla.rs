@@ -3,7 +3,8 @@ use rltk::RandomNumberGenerator;
 use specs::World;
 use crate::map::Map;
 use crate::{MAP_HEIGHT, MAP_WIDTH, Position, spawner, TileType};
-use crate::map_builder::common::{generate_voronoi_spawn_regions, paint, remove_unreachable_areas_returning_most_distant, snapshot, Symmetry};
+use crate::map_builder::common::{generate_voronoi_spawn_regions, paint, remove_unreachable_areas_returning_most_distant, Symmetry};
+#[cfg(feature = "mapgen_visualiser")] use crate::map_builder::common::snapshot;
 use crate::map_builder::MapBuilder;
 
 #[derive(PartialEq, Copy, Clone)]
@@ -22,13 +23,13 @@ pub struct DLABuilder {
 	brush_size: i32,
 	symmetry: Symmetry,
 	floor_percent: f32,
-	name: String,
+	#[cfg(feature = "mapgen_visualiser")] name: String,
 	#[cfg(feature = "mapgen_visualiser")] history: Vec<Map>,
 }
 
 impl DLABuilder {
 	pub fn new (
-		name: String,
+		#[allow(unused_variables)] name: String,
 		depth: i32,
 		algorithm: DLAAlgorithm,
 		brush_size: i32,
@@ -48,7 +49,7 @@ impl DLABuilder {
 			brush_size,
 			symmetry,
 			floor_percent: 0.25,
-			name,
+			#[cfg(feature = "mapgen_visualiser")] name,
 			#[cfg(feature = "mapgen_visualiser")] history: Vec::new(),
 		}
 	}

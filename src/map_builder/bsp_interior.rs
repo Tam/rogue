@@ -2,7 +2,7 @@ use rltk::RandomNumberGenerator;
 use specs::World;
 use crate::map::Map;
 use crate::{MAP_HEIGHT, MAP_WIDTH, Position, spawner, TileType};
-use crate::map_builder::common::snapshot;
+#[cfg(feature = "mapgen_visualiser")] use crate::map_builder::common::snapshot;
 use crate::map_builder::MapBuilder;
 use crate::rect::Rect;
 

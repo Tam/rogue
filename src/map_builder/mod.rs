@@ -7,6 +7,7 @@ mod drunkard;
 mod maze;
 mod dla;
 mod voronoi;
+mod waveform_collapse;
 
 use specs::World;
 use crate::Position;
@@ -20,8 +21,9 @@ use crate::map_builder::{
 	drunkard::*,
 	maze::MazeBuilder,
 	dla::DLABuilder,
+	voronoi::VoronoiBuilder,
+	waveform_collapse::WaveformCollapseBuilder,
 };
-use crate::map_builder::voronoi::VoronoiBuilder;
 
 pub trait MapBuilder {
 	fn get_map (&mut self) -> Map;
@@ -38,35 +40,44 @@ pub trait MapBuilder {
 	fn take_snapshot (&mut self);
 }
 
+#[allow(unused_macros)]
 macro_rules! pick_random {
-	($($x:expr),* $(,)?) => {{
+	($depth:expr, $($x:expr),* $(,)?) => {{
 		let mut rng = rltk::RandomNumberGenerator::new();
 		let builder = (rng.roll_dice(1, ${count(x, 0)}) - 1) as u8;
+		let mut result : Box<dyn MapBuilder>;
 		match builder {
-			$(${index()} => $x,)*
+			$(${index()} => result = Box::new($x($depth)),)*
 			_ => panic!("Map out of range!")
 		}
+
+		if rng.roll_dice(1, 3) == 1 {
+			result = Box::new(WaveformCollapseBuilder::derived_map($depth, result));
+		}
+
+		result
 	}};
 }
 
 pub fn random_builder (depth: i32) -> Box<dyn MapBuilder> {
-	pick_random!(
-		Box::new(SimpleMapBuilder::new(depth)),
-		Box::new(BspInteriorBuilder::new(depth)),
-		Box::new(CellularAutomataBuilder::new(depth)),
-		Box::new(BspDungeonBuilder::new(depth)),
-		Box::new(DrunkardWalkBuilder::open_area(depth)),
-		Box::new(DrunkardWalkBuilder::open_halls(depth)),
-		Box::new(DrunkardWalkBuilder::winding_passages(depth)),
-		Box::new(DrunkardWalkBuilder::fat_passages(depth)),
-		Box::new(DrunkardWalkBuilder::fearful_symmetry(depth)),
-		Box::new(MazeBuilder::new(depth)),
-		Box::new(DLABuilder::walk_inwards(depth)),
-		Box::new(DLABuilder::walk_outwards(depth)),
-		Box::new(DLABuilder::central_attractor(depth)),
-		Box::new(DLABuilder::insectoid(depth)),
-		Box::new(VoronoiBuilder::pythagoras(depth)),
-		Box::new(VoronoiBuilder::manhattan(depth)),
-		Box::new(VoronoiBuilder::chebyshev(depth)),
+	pick_random!(depth,
+		SimpleMapBuilder::new,
+		BspInteriorBuilder::new,
+		CellularAutomataBuilder::new,
+		BspDungeonBuilder::new,
+		DrunkardWalkBuilder::open_area,
+		DrunkardWalkBuilder::open_halls,
+		DrunkardWalkBuilder::winding_passages,
+		DrunkardWalkBuilder::fat_passages,
+		DrunkardWalkBuilder::fearful_symmetry,
+		MazeBuilder::new,
+		DLABuilder::walk_inwards,
+		DLABuilder::walk_outwards,
+		DLABuilder::central_attractor,
+		DLABuilder::insectoid,
+		VoronoiBuilder::pythagoras,
+		VoronoiBuilder::manhattan,
+		VoronoiBuilder::chebyshev,
+		WaveformCollapseBuilder::test_map,
 	)
 }

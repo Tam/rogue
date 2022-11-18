@@ -5,7 +5,7 @@ use specs::{Entity};
 
 // region: Rendering
 
-#[derive(PartialEq, Copy, Clone, Serialize, Deserialize)]
+#[derive(PartialEq, Eq, Hash, Copy, Clone, Serialize, Deserialize, Debug)]
 pub enum TileType {
 	Void,
 	Placeholder,
@@ -151,6 +151,10 @@ impl Map {
 			bloodstains: HashSet::new(),
 			tile_content: vec![Vec::new(); l],
 		}
+	}
+
+	pub fn new_default (depth: i32) -> Map {
+		Map::new(MAP_WIDTH as i32, MAP_HEIGHT as i32, depth, None)
 	}
 
 	pub fn xy_idx (&self, x: i32, y: i32) -> usize {

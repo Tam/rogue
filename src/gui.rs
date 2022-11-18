@@ -3,6 +3,7 @@ use specs::prelude::*;
 use crate::{CombatStats, Equipped, Hidden, HungerClock, HungerState, InBackpack, Name, Player, Position, RunState, State, Viewshed};
 use crate::gamelog::GameLog;
 use crate::map::Map;
+use crate::rex_assets::RexAssets;
 use crate::saveload_system::does_save_exist;
 
 // Enums
@@ -40,6 +41,9 @@ pub enum GameOverResult {
 pub fn draw_main_menu (gs: &State, ctx: &mut Rltk) -> MainMenuResult {
 	let save_exists = does_save_exist();
 	let runstate = gs.ecs.fetch::<RunState>();
+
+	let assets = gs.ecs.fetch::<RexAssets>();
+	ctx.render_xp_sprite(&assets.menu, 0, 0);
 
 	ctx.print_color_centered(
 		15,

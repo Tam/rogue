@@ -14,6 +14,7 @@ pub enum Symmetry {
 	Both,
 }
 
+#[cfg(feature = "mapgen_visualiser")]
 pub fn snapshot (map: &Map) -> Map {
 	let mut snapshot = map.clone();
 	for v in snapshot.revealed_tiles.iter_mut() { *v = true; }
