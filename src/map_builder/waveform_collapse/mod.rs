@@ -1,4 +1,3 @@
-mod image_loader;
 mod constraints;
 mod common;
 mod solver;
@@ -12,21 +11,13 @@ use crate::map_builder::common::{generate_voronoi_spawn_regions, remove_unreacha
 use crate::map_builder::MapBuilder;
 use crate::map_builder::waveform_collapse::common::MapChunk;
 use crate::map_builder::waveform_collapse::constraints::{build_patterns, patterns_to_constraints, render_pattern_to_map};
-use crate::map_builder::waveform_collapse::image_loader::load_rex_map;
 use crate::map_builder::waveform_collapse::solver::Solver;
-
-#[derive(PartialEq, Copy, Clone)]
-pub enum WaveformMode {
-	TestMap,
-	Derived,
-}
 
 pub struct WaveformCollapseBuilder {
 	map: Map,
 	starting_position: Position,
 	depth: i32,
 	noise_areas: HashMap<i32, Vec<usize>>,
-	mode: WaveformMode,
 	derive_from: Option<Box<dyn MapBuilder>>,
 	#[cfg(feature = "mapgen_visualiser")] name: String,
 	#[cfg(feature = "mapgen_visualiser")] history: Vec<Map>,
@@ -35,7 +26,6 @@ pub struct WaveformCollapseBuilder {
 impl WaveformCollapseBuilder {
 	pub fn new (
 		depth: i32,
-		mode: WaveformMode,
 		derive_from: Option<Box<dyn MapBuilder>>,
 		#[cfg(feature = "mapgen_visualiser")] name: String,
 	) -> WaveformCollapseBuilder {
@@ -49,21 +39,10 @@ impl WaveformCollapseBuilder {
 			starting_position: Position { x: 0, y: 0 },
 			depth,
 			noise_areas: HashMap::new(),
-			mode,
 			derive_from,
 			#[cfg(feature = "mapgen_visualiser")] name,
 			#[cfg(feature = "mapgen_visualiser")] history: Vec::new(),
 		}
-	}
-
-	#[allow(dead_code)]
-	pub fn test_map (depth: i32) -> WaveformCollapseBuilder {
-		WaveformCollapseBuilder::new(
-			depth,
-			WaveformMode::TestMap,
-			None,
-			#[cfg(feature = "mapgen_visualiser")] "Test Map".to_string(),
-		)
 	}
 
 	#[allow(dead_code)]
@@ -73,7 +52,6 @@ impl WaveformCollapseBuilder {
 
 		WaveformCollapseBuilder::new(
 			depth,
-			WaveformMode::Derived,
 			derive_from,
 			#[cfg(feature = "mapgen_visualiser")] format!(
 				"[Derived] {}",
@@ -138,18 +116,11 @@ impl MapBuilder for WaveformCollapseBuilder {
 
 		let mut source_map: Map;
 
-		if self.mode == WaveformMode::TestMap {
-			source_map = load_rex_map(
-				self.depth,
-				&rltk::rex::XpFile::from_resource("../resources/wfc-demo1.xp").unwrap(),
-			);
-		} else {
-			let prebuilder = &mut self.derive_from.as_mut().unwrap();
-			prebuilder.build();
-			source_map = prebuilder.get_map();
-			for t in source_map.tiles.iter_mut() {
-				if *t == TileType::DownStairs { *t = TileType::Floor }
-			}
+		let prebuilder = &mut self.derive_from.as_mut().unwrap();
+		prebuilder.build();
+		source_map = prebuilder.get_map();
+		for t in source_map.tiles.iter_mut() {
+			if *t == TileType::DownStairs { *t = TileType::Floor }
 		}
 
 		let patterns = build_patterns(

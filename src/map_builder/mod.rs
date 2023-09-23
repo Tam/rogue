@@ -8,6 +8,7 @@ mod maze;
 mod dla;
 mod voronoi;
 mod waveform_collapse;
+mod prefab_builder;
 
 use specs::World;
 use crate::Position;
@@ -24,6 +25,7 @@ use crate::map_builder::{
 	voronoi::VoronoiBuilder,
 	waveform_collapse::WaveformCollapseBuilder,
 };
+use crate::map_builder::prefab_builder::PrefabBuilder;
 
 pub trait MapBuilder {
 	fn get_map (&mut self) -> Map;
@@ -60,24 +62,24 @@ macro_rules! pick_random {
 }
 
 pub fn random_builder (depth: i32) -> Box<dyn MapBuilder> {
-	pick_random!(depth,
-		SimpleMapBuilder::new,
-		BspInteriorBuilder::new,
-		CellularAutomataBuilder::new,
-		BspDungeonBuilder::new,
-		DrunkardWalkBuilder::open_area,
-		DrunkardWalkBuilder::open_halls,
-		DrunkardWalkBuilder::winding_passages,
-		DrunkardWalkBuilder::fat_passages,
-		DrunkardWalkBuilder::fearful_symmetry,
-		MazeBuilder::new,
-		DLABuilder::walk_inwards,
-		DLABuilder::walk_outwards,
-		DLABuilder::central_attractor,
-		DLABuilder::insectoid,
-		VoronoiBuilder::pythagoras,
-		VoronoiBuilder::manhattan,
-		VoronoiBuilder::chebyshev,
-		WaveformCollapseBuilder::test_map,
-	)
+	// pick_random!(depth,
+	// 	SimpleMapBuilder::new,
+	// 	BspInteriorBuilder::new,
+	// 	CellularAutomataBuilder::new,
+	// 	BspDungeonBuilder::new,
+	// 	DrunkardWalkBuilder::open_area,
+	// 	DrunkardWalkBuilder::open_halls,
+	// 	DrunkardWalkBuilder::winding_passages,
+	// 	DrunkardWalkBuilder::fat_passages,
+	// 	DrunkardWalkBuilder::fearful_symmetry,
+	// 	MazeBuilder::new,
+	// 	DLABuilder::walk_inwards,
+	// 	DLABuilder::walk_outwards,
+	// 	DLABuilder::central_attractor,
+	// 	DLABuilder::insectoid,
+	// 	VoronoiBuilder::pythagoras,
+	// 	VoronoiBuilder::manhattan,
+	// 	VoronoiBuilder::chebyshev,
+	// )
+	Box::new(PrefabBuilder::new(depth))
 }
