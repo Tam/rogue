@@ -62,24 +62,24 @@ macro_rules! pick_random {
 }
 
 pub fn random_builder (depth: i32) -> Box<dyn MapBuilder> {
-	// pick_random!(depth,
-	// 	SimpleMapBuilder::new,
-	// 	BspInteriorBuilder::new,
-	// 	CellularAutomataBuilder::new,
-	// 	BspDungeonBuilder::new,
-	// 	DrunkardWalkBuilder::open_area,
-	// 	DrunkardWalkBuilder::open_halls,
-	// 	DrunkardWalkBuilder::winding_passages,
-	// 	DrunkardWalkBuilder::fat_passages,
-	// 	DrunkardWalkBuilder::fearful_symmetry,
-	// 	MazeBuilder::new,
-	// 	DLABuilder::walk_inwards,
-	// 	DLABuilder::walk_outwards,
-	// 	DLABuilder::central_attractor,
-	// 	DLABuilder::insectoid,
-	// 	VoronoiBuilder::pythagoras,
-	// 	VoronoiBuilder::manhattan,
-	// 	VoronoiBuilder::chebyshev,
-	// )
-	Box::new(PrefabBuilder::new(depth))
+	pick_random!(depth,
+		SimpleMapBuilder::new,
+		BspInteriorBuilder::new,
+		CellularAutomataBuilder::new,
+		BspDungeonBuilder::new,
+		DrunkardWalkBuilder::open_area,
+		DrunkardWalkBuilder::open_halls,
+		DrunkardWalkBuilder::winding_passages,
+		DrunkardWalkBuilder::fat_passages,
+		DrunkardWalkBuilder::fearful_symmetry,
+		MazeBuilder::new,
+		DLABuilder::walk_inwards,
+		DLABuilder::walk_outwards,
+		DLABuilder::central_attractor,
+		DLABuilder::insectoid,
+		VoronoiBuilder::pythagoras,
+		VoronoiBuilder::manhattan,
+		VoronoiBuilder::chebyshev,
+	)
+	// Box::new(PrefabBuilder::new(depth))
 }

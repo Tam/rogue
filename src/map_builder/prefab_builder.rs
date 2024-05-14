@@ -1,5 +1,6 @@
 use specs::World;
 use crate::map::Map;
+#[cfg(feature = "mapgen_visualiser")]
 use crate::map_builder::common::snapshot;
 use crate::map_builder::MapBuilder;
 use crate::{Position, TileType};

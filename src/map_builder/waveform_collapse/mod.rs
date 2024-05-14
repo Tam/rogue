@@ -7,7 +7,9 @@ use rltk::RandomNumberGenerator;
 use specs::World;
 use crate::map::Map;
 use crate::{MAP_HEIGHT, MAP_WIDTH, Position, spawner, TileType};
-use crate::map_builder::common::{generate_voronoi_spawn_regions, remove_unreachable_areas_returning_most_distant, snapshot};
+#[cfg(feature = "mapgen_visualiser")]
+use crate::map_builder::common::snapshot;
+use crate::map_builder::common::{generate_voronoi_spawn_regions, remove_unreachable_areas_returning_most_distant};
 use crate::map_builder::MapBuilder;
 use crate::map_builder::waveform_collapse::common::MapChunk;
 use crate::map_builder::waveform_collapse::constraints::{build_patterns, patterns_to_constraints, render_pattern_to_map};
@@ -48,6 +50,7 @@ impl WaveformCollapseBuilder {
 	#[allow(dead_code)]
 	pub fn derived_map (depth: i32, builder: Box<dyn MapBuilder>) -> WaveformCollapseBuilder {
 		let derive_from = Some(builder);
+		#[cfg(feature = "mapgen_visualiser")]
 		let name = derive_from.as_ref().unwrap().get_name();
 
 		WaveformCollapseBuilder::new(
